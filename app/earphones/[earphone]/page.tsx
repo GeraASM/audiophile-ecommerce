@@ -1,7 +1,7 @@
 "use client";
 import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import Products from "@/components/shared/products";
+import {Products} from "@/components/shared/products";
 import { WrapperProduct } from "@/components/shared/wrapper";
 import Bringing from "@/components/shared/bringing";
 import { Feature, InTheBox, Recomendation, Photograph, Device, DescriptionDevice } from "@/components/shared/params/params";

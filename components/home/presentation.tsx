@@ -4,7 +4,7 @@ import ButtonSeeProduct from "../shared/button-see-product";
 const backgroundImage = "/assets/shared/mark-two-headphones-back.png";
 export default function Presentation() {
     return (
-        <section className="bg-very-dark-gray w-full h-[500px] grid place-items-center ds:grid-cols-2 relative overflow-hidden">
+        <section className=" bg-very-dark-gray w-full h-[500px] grid place-items-center ds:grid-cols-2 relative overflow-hidden">
             <section className="text-center flex flex-col gap-5 items-center  px-4 max-w-[379px] relative z-1">
                 <p className="lorem text-white/50">NEWE PRODUCT</p>                
                 <h2 className="h2 text-white">XX99 Mark II HeadphoneS</h2>

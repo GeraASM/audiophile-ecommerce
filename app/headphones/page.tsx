@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import type { ProductsType, Product } from "@/types/types";
 import Device from "@/components/shared/device";
 import NameProduct from "@/components/shared/name-product";
-import Products from "@/components/shared/products";
+import {Products }from "@/components/shared/products";
 
 import Bringing from "@/components/shared/bringing";
 export default function Headphones() {

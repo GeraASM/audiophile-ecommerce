@@ -23,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-      className={`${manrope.variable} font-manrope max-w-mobile md:max-w-tablet ds:min-w-desktop ds:max-w-desktop min-h-screen`}
+      className={`${manrope.variable} font-manrope max-w-mobile md:max-w-tablet ds:min-w-desktop ds:max-w-desktop min-h-screen relative`}
       >
         <Header />
         {children}

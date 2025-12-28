@@ -6,7 +6,9 @@
   --color-soft-orange: #fbaf85;
   --color-very-dark-gray: #101010;
   --color-very-light-gray: #F1F1F1;
+  --color-light-gray: #CFCFCF;
   --color-mostly-white: #FAFAFA;
+
   
   --leading-h1: 58px;
   --tracking-h1: 2px;
@@ -47,9 +49,23 @@
 
   --breakpoint-ds: 1440px;
 
+  --tracking-label: -0.21px;
+
 }
 
 @layer components {
+
+  .selected:has(input[type='radio']:checked) {
+    border: 1px solid var(--color-moderate-orange) !important;
+
+  }
+
+  label {
+    @apply text-[12px] leading-none tracking-label text-black font-bold block mb-3;
+  }
+  input {
+    @apply block rounded-lg border-light-gray border w-full p-4 focus:outline-0 font-bold text-[14px] tracking-label placeholder-very-light-gray;
+  }
 
   .mark:hover .shop {
     color: #D87D4A !important;

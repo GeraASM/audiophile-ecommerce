@@ -4,8 +4,7 @@ import { useState, useEffect, Dispatch, SetStateAction } from "react";
 import Image from "next/image";
 import type { CartProduct } from "@/types/types";
 const styleOrange = "bg-moderate-orange text-white hover:bg-soft-orange";
-
-
+import { useRouter } from "next/navigation";
 function Device ({device}: {device: CartProduct}) {
     const {addToCart, removeDevice} = useCart();
     const [count, setCount] = useState<number>(1);
@@ -74,16 +73,22 @@ function Device ({device}: {device: CartProduct}) {
 
 
 export default function Cart({showCart}: {showCart: Dispatch<SetStateAction<boolean>>}) {
+    const router = useRouter();
     const {removeCart, cart} = useCart();
     
-    const products = Object.values(cart);
+    const products = Object.values(cart) || [];
 
     const total = products.reduce((acc, device) => acc + device.price , 0) || 0;
+
+    const checkout = () => {
+        showCart(false);
+        router.push("/checkout");
+    }
     
     return (
         <>
             <div className="fixed inset-0 bg-black/50 z-1"></div>
-            <section className="fixed left-1/2 top-1/2 -translate-1/2 rounded-lg bg-white z-11 w-[330px] h-[488px] p-6 flex flex-col gap-8">
+            <section className="fixed left-1/2 top-1/2 -translate-1/2 md:left-auto md:right-[20px] xl:right-[140px] md:top-[110px] md:translate-0  rounded-lg bg-white z-11 w-[330px] h-[488px] p-6 flex flex-col gap-8">
                 <div className="flex justify-between items-center">
                     <p className="price">CART ({products.length})</p>
                     <button onClick={() => {
@@ -107,7 +112,9 @@ export default function Cart({showCart}: {showCart: Dispatch<SetStateAction<bool
                         <p className="text-black/50 p">TOTAL</p>
                         <p className="price">$ {total.toLocaleString("en-US")}</p>
                     </div>
-                    <button className={`cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>CHECKOUT</button>
+                   
+                    <button onClick={checkout} disabled={products.length === 0 || total === 0} className={`disabled:bg-moderate-orange/20 cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>CHECKOUT</button>
+                    
                 </section>
             </section>
         </>
