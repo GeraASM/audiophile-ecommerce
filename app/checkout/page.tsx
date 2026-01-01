@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+
 import { WrapperProduct } from "@/components/shared/wrapper";
 import { useCart } from "@/storage/cart";
 import Image from "next/image";
@@ -7,9 +7,24 @@ import type { CartProduct } from "@/types/types";
 const styleOrange = "bg-moderate-orange text-white hover:bg-soft-orange";
 import { IconConfirm } from "@/components/shared/icons";
 import { Dispatch, SetStateAction, useState } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
+
+
+import { useForm } from "react-hook-form";
+import {z} from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 function Modal({grandTotal, devices, confirm}: {grandTotal: number; devices: CartProduct[]; confirm: Dispatch<SetStateAction<boolean>>}) {
+    const router = useRouter();
+    const {removeCart} = useCart();
+
+    const finishAll = () => {
+        confirm(false);
+        removeCart();
+        router.push("/");
+    }
+    
+
     return (
         <>
             <div className="fixed inset-0 bg-black/40 z-0"></div>
@@ -45,9 +60,9 @@ function Modal({grandTotal, devices, confirm}: {grandTotal: number; devices: Car
 
                     </div>
                 </section>
-                <Link href={"/"}>
-                    <button className={`cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>BACK TO HOME</button>
-                </Link>
+                
+                    <button onClick={finishAll} className={`cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>BACK TO HOME</button>
+                
                 
             </section>
         </>
@@ -68,6 +83,25 @@ function Device({device}: {device: CartProduct}) {
     )
 }
 
+const FormCheckout = z.object({
+    name: z.string().trim().min(3, "Required this field"),
+    email: z.email("Invalid email"),
+    phone: z.string().trim().transform((val) => val.startsWith("+") ? val.replaceAll(" ", "") : "+"+val.replaceAll(" ", "")),
+    address: z.string().trim(),
+    zip: z.string().regex(/^\d{5}$/, "Write five digits").transform((val) => Number(val)),
+    city: z.string().trim().min(1, "Required this field"),
+    country: z.string().trim(),
+    payment: z.string("Choose payment method").trim(),
+    eMoneyNumber: z.coerce.number(),
+    eMoneyPin: z.string().regex(/^\d{4}$/, "Write four digits").transform((val) => Number(val))
+
+})
+
+type Data = z.infer<typeof FormCheckout>;
+
+function TextError({text}: {text: string}) {
+    return <p className="text-red-400 text-sm subtitle">{text}</p>
+}
 
 
 export default function Checkout() {
@@ -80,6 +114,18 @@ export default function Checkout() {
     const shipping = 50;
     const grandTotal = total + vat + shipping;
 
+
+    const confirmPay = () => {
+        setConfirm(!confirm);
+    }
+
+    const {register, handleSubmit, formState: {errors}} = useForm({
+        resolver: zodResolver(FormCheckout)
+    });
+    const onSubmit = (data: Data) => {
+        console.log(data);
+        confirmPay();
+    }
     return (
         <>
             {
@@ -91,24 +137,34 @@ export default function Checkout() {
                 Go Back
             </button>
             {/* PAY */}
-            <section className="mt-4 mb-[100px] flex flex-col gap-10 ds:flex-row ds:items-start">
+            <form onSubmit={handleSubmit(onSubmit)}  className="mt-4 mb-[100px] flex flex-col gap-10 ds:flex-row ds:items-start">
                 <section className="rounded-lg bg-white p-8 max-w-[730px] ds:min-w-[730px]">
                     <h4 className="h4 text-black">CHECKOUT</h4>
-                    <form className="mt-6 flex flex-col gap-10" >
+                    <section className="mt-6 flex flex-col gap-10" >
                         {/* BILLING */}
                         <div className="flex flex-col gap-4 md:grid md:grid-cols-2">
                             <p className="subtitle md:col-start-1 md:col-end-3">BILLING DETAILS</p>
                             <fieldset>
                                 <label htmlFor="name">Name</label>
-                                <input type="text" name="name" id="name" placeholder="Alexei Ward"/>
+                                <input type="text" id="name" placeholder="Alexei Ward"
+                                {...register("name")}
+                                />
+
+                                {errors.name && <TextError text={errors.name.message!} />}
                             </fieldset>
                             <fieldset>
                                 <label htmlFor="email">Email Address</label>
-                                <input type="email" name="email" id="email" placeholder="alexei@mail.com"/>
+                                <input type="email" id="email" placeholder="alexei@mail.com"
+                                    {...register("email")}
+                                />
+                                {errors.email && <TextError text={errors.email.message!} />}
                             </fieldset>
                             <fieldset>
                                 <label htmlFor="phone">Phone Number</label>
-                                <input type="tel" name="phone" id="phone" placeholder="+1 202-555-0136" />
+                                <input type="tel" id="phone" placeholder="+1 202-555-0136" 
+                                    {...register("phone")}
+                                />
+                                {errors.phone && <TextError text={errors.phone.message!} />}
                             </fieldset>
                         </div>
                         {/* SHIPPING */}
@@ -116,19 +172,31 @@ export default function Checkout() {
                             <p className="subtitle md:col-span-2">SHIPPING INFO</p>
                             <fieldset className="md:col-span-2">
                                 <label htmlFor="address">Your Address</label>
-                                <input type="text" name="address" id="address" placeholder="1137 Williams Avenue" />
+                                <input type="text" id="address" placeholder="1137 Williams Avenue" 
+                                    {...register("address")}
+                                />
+                                {errors.address && <TextError text={errors.address.message!} />}
                             </fieldset>
                             <fieldset>
                                 <label htmlFor="zip">ZIP Code</label>
-                                <input type="number" name="zip" id="zip" placeholder="10001" />
+                                <input type="number" id="zip" placeholder="10001" 
+                                    {...register("zip")}
+                                />
+                                {errors.zip && <TextError text={errors.zip.message!} />}
                             </fieldset>
                             <fieldset>
                                 <label htmlFor="city">City</label>
-                                <input type="text" name="city" id="city" placeholder="New York" />
+                                <input type="text" id="city" placeholder="New York"
+                                    {...register("city")}
+                                />
+                                {errors.city && <TextError text={errors.city.message!} />}
                             </fieldset>
                             <fieldset>
                                 <label htmlFor="country">Country</label>
-                                <input type="text" name="country" id="country" placeholder="United States" />
+                                <input type="text" id="country" placeholder="United States" 
+                                    {...register("country")}
+                                />
+                                {errors.country && <TextError text={errors.country.message!} />}
                             </fieldset>
                         
                         </div>
@@ -139,29 +207,39 @@ export default function Checkout() {
                                 <p className="text-[12px] leading-none tracking-label text-black font-bold mb-3">Payment Method</p>
                                 <div className="md:min-w-[309px]">
                                     <label htmlFor="e-money" className="selected flex p-5 items-center gap-4 rounded-lg border-light-gray border">
-                                        <input className="w-3 accent-moderate-orange shrink-0" type="radio" name="payment" id="e-money" value="e-Money" />
+                                        <input className="w-3 accent-moderate-orange shrink-0" type="radio" id="e-money" value="e-Money" 
+                                            {...register("payment")}
+                                        />
                                         <p>e-Money</p>
                                     </label>
                                     <label htmlFor="cash" className="selected flex p-5 items-center gap-4 rounded-lg border-light-gray border">
-                                        <input className="w-3 accent-moderate-orange shrink-0" type="radio" name="payment" id="cash" value="Cash on Delivery" />
+                                        <input className="w-3 accent-moderate-orange shrink-0" type="radio" id="cash" value="Cash on Delivery" 
+                                            {...register("payment")}
+                                        />
                                         <p>Cash on Delivery</p>
                                     </label>
+                                    {errors.payment && <TextError text={errors.payment.message!} />}
                                 </div>
                             </fieldset>
                             <div className="flex flex-col gap-4 ds:flex-row">
                                 <fieldset className="ds:flex-1">
                                     <label htmlFor="e-money-number">e-Money Number</label>
-                                    <input type="number" name="e-money-number" id="e-money-number" placeholder="1234738493"/>
-
+                                    <input type="number" id="e-money-number" placeholder="1234738493"
+                                        {...register("eMoneyNumber")}
+                                    />
+                                    {errors.eMoneyNumber && <TextError text={errors.eMoneyNumber.message!} />}
                                 </fieldset>
                                 <fieldset className="ds:flex-1">
                                     <label htmlFor="e-money-pin">e-Money PIN</label>
-                                    <input type="number" name="e-money-pin" id="e-money-pin" placeholder="6891" />
+                                    <input type="number" id="e-money-pin" placeholder="6891" 
+                                        {...register("eMoneyPin")}
+                                    />
+                                    {errors.eMoneyPin && <TextError text={errors.eMoneyPin.message!} />}
                                 </fieldset>
 
                             </div>
                         </div>
-                    </form>
+                    </section>
 
                 </section>
                 {/* SUMMARY  */}
@@ -194,9 +272,9 @@ export default function Checkout() {
                         </div>
                         
                     </section>
-                    <button disabled={devices.length === 0} onClick={() => setConfirm(!confirm)} className={`disabled:bg-moderate-orange/20 cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>CONTINUE & PAY</button>
+                    <button disabled={devices.length === 0} type="submit" className={`disabled:bg-moderate-orange/20 cursor-pointer transition-colors subtitle w-full h-[48px] ${styleOrange}`}>CONTINUE & PAY</button>
                 </section>
-            </section>
+            </form>
 
         </WrapperProduct>
         </>

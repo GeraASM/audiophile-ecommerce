@@ -7,6 +7,8 @@ import Bringing from "@/components/shared/bringing";
 import { Feature, InTheBox, Recomendation, Photograph, Device, DescriptionDevice } from "@/components/shared/params/params";
 import type { ProductsType, Product } from "@/types/types";
 
+import SaveCartAnimation from "@/components/shared/save-cart-animation";
+
 const numberFormat = new Intl.NumberFormat("en-US");
 const styleOrange = "bg-moderate-orange text-white hover:bg-soft-orange";
 
@@ -28,6 +30,8 @@ export default function Information() {
 
     const [price, setPrice] = useState<number>(0);
     const [count, setCount] = useState<number>(1);
+
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     const {addToCart} = useCart();
   useEffect(() => {
@@ -53,6 +57,13 @@ export default function Information() {
     }
   }, [count]);
 
+   useEffect(() => {
+    if (showModal) {
+      const close = setTimeout(() => setShowModal(false), 3000);
+      return () => clearTimeout(close);
+    }
+  }, [showModal]);
+
 
   const saveCart = () => {
     const slug = deviceInformation?.slug as string;
@@ -64,9 +75,16 @@ export default function Information() {
     console.log("Count: ",count);
     console.log("Price: ", price);
     addToCart({slug, name, image, count, price, priceOriginal: deviceInformation?.price!});
+    setShowModal(true);
   }
 
     return (
+      <>
+      {
+                showModal &&
+                <SaveCartAnimation />
+      }
+      
         <main className="max-w-mobile md:max-w-tablet ds:min-w-desktop ds:max-w-desktop py-4">
           <WrapperProduct>
             <button className="p text-black/50 cursor-pointer" onClick={() => router.back()}>
@@ -148,5 +166,6 @@ export default function Information() {
           <Products />
           <Bringing />
         </main>
+      </>
     )
 }

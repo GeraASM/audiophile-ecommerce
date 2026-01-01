@@ -51,6 +51,13 @@
 
   --tracking-label: -0.21px;
 
+  --animate-show-modal: show-modal 1s linear forwards;
+  @keyframes show-modal {
+    to {
+      transform: translateY(100px);
+    }
+  }
+
 }
 
 @layer components {

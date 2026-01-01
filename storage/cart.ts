@@ -20,8 +20,10 @@ export const useCart = create(
         })),
         removeCart: () => set({cart: {}}),
         removeDevice: (slug) => set((state) => {
-            const {[slug]: _, ...rest} = state.cart;
-            return {cart: rest}
+            const cartMap = new Map(Object.entries(state.cart));
+            cartMap.delete(slug);
+            const restClear = Object.fromEntries(cartMap);
+            return {cart: restClear}
             
         })
     }),

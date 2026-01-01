@@ -5,10 +5,13 @@ import { ItemLi } from "./footer"
 import Cart from "@/components/cart/cart";
 import { useState } from "react";
 import {ProductsMenu} from "./products";
+import { useCart } from "@/storage/cart";
 export default function Header() {
     const [showCart, setShowCart] = useState<boolean>(false);
-    const [menu, setMenu] = useState<boolean>(false)
+    const [menu, setMenu] = useState<boolean>(false);
+    const {cart} = useCart();
 
+    let countDevice = Object.keys(cart).length;
     return (
         <>
             {
@@ -49,7 +52,15 @@ export default function Header() {
                             </ItemLi>
                         </ul>
                     </nav>
-                    <button onClick={() => setShowCart(!showCart)} className="p-2"><IconCart /></button>
+                    <button onClick={() => setShowCart(!showCart)} className="p-2 relative">
+                        <IconCart />
+                        {
+                            countDevice > 0 &&
+                            <div className="absolute top-[-10px] right-[-10px] rounded-full text-white bg-moderate-orange w-8 h-8 content-center text-center">
+                                    <p>{countDevice}</p>
+                            </div>
+                        }
+                    </button>
                     <div className="h-px w-full absolute bottom-0 bg-white/10"></div>
 
                 </nav>
