@@ -29,8 +29,6 @@ export default function Information() {
 
     const [price, setPrice] = useState<number>(0);
     const [count, setCount] = useState<number>(1);
-
-    const [showModal, setShowModal] = useState<boolean>(false);
   useEffect(() => {
     fetch("/data.json").then((res) => {
         if (res.ok) return res.json();
@@ -54,28 +52,16 @@ export default function Information() {
     }
   }, [count]);
 
-  useEffect(() => {
-    if (showModal) {
-      const close = setTimeout(() => setShowModal(false), 3000);
-      return () => clearTimeout(close);
-    }
-  }, [showModal]);
-
   const saveCart = () => {
     const slug = deviceInformation?.slug as string;
     const name = deviceInformation?.name!.replace(/Wireless Earphones/, "").trim() as string;
     const image = cartImages[name];
      addToCart({slug, name, image, count, price, priceOriginal: deviceInformation?.price!});
-      setShowModal(true);
-  
   }
 
     return (
       <>
-        {
-                        showModal &&
-                        <SaveCartAnimation />
-              }
+       
         <main className="max-w-mobile md:max-w-tablet ds:min-w-desktop ds:max-w-desktop py-4">
           <WrapperProduct>
             <button className="p text-black/50 cursor-pointer" onClick={() => router.back()}>

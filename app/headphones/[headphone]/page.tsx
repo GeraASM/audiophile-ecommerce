@@ -31,8 +31,6 @@ export default function Information() {
     const [price, setPrice] = useState<number>(0);
     const [count, setCount] = useState<number>(1);
 
-    const [showModal, setShowModal] = useState<boolean>(false);
-
     const {addToCart} = useCart();
   useEffect(() => {
     fetch("/data.json").then((res) => {
@@ -57,13 +55,6 @@ export default function Information() {
     }
   }, [count]);
 
-   useEffect(() => {
-    if (showModal) {
-      const close = setTimeout(() => setShowModal(false), 3000);
-      return () => clearTimeout(close);
-    }
-  }, [showModal]);
-
 
   const saveCart = () => {
     const slug = deviceInformation?.slug as string;
@@ -75,15 +66,11 @@ export default function Information() {
     console.log("Count: ",count);
     console.log("Price: ", price);
     addToCart({slug, name, image, count, price, priceOriginal: deviceInformation?.price!});
-    setShowModal(true);
+
   }
 
     return (
       <>
-      {
-                showModal &&
-                <SaveCartAnimation />
-      }
       
         <main className="max-w-mobile md:max-w-tablet ds:min-w-desktop ds:max-w-desktop py-4">
           <WrapperProduct>
